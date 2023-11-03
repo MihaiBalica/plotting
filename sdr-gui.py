@@ -261,7 +261,7 @@ class SDRPlotter:
             ax.set_xlabel('Time')
             ax.set_ylabel('Phase')
 
-        # ax.grid(True)
+        ax.minorticks_on()
         ax.grid(True, which='both', linestyle='--', linewidth=0.5)
         self.canvas.draw()
 
