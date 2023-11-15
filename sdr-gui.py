@@ -160,6 +160,7 @@ class SDRPlotter:
         self.toolbar = NavigationToolbar2Tk(self.canvas, self.root)
         self.toolbar.update()
         self.canvas.get_tk_widget().pack()
+        self.canvas.mpl_connect('scroll_event', self.on_scroll)
 
     def load_input_data(self):
         file_path = filedialog.askopenfilename(title="Select SDR Input Data File",
@@ -187,6 +188,30 @@ class SDRPlotter:
         # Update the x-limits of the plot without redrawing the entire plot
         ax.set_xlim(new_x_limits)
         self.canvas.draw_idle()
+
+    def on_scroll(self, event):
+        ax = self.figure.get_axes()[0]
+        x_min, x_max = ax.get_xlim()
+        x_range = x_max - x_min
+
+        x_position = event.xdata  # Get the x-position of the mouse cursor
+
+        # Define the zoom factor (you can adjust this value to control zoom sensitivity)
+        zoom_factor = 0.1
+
+        if event.button == 'up':
+            # Zoom in on the X-axis
+            new_x_min = x_min + (x_position - x_min) * zoom_factor
+            new_x_max = x_max - (x_max - x_position) * zoom_factor
+        elif event.button == 'down':
+            # Zoom out on the X-axis
+            new_x_min = x_min - (x_position - x_min) * zoom_factor
+            new_x_max = x_max + (x_max - x_position) * zoom_factor
+        else:
+            return
+
+        ax.set_xlim(new_x_min, new_x_max)
+        self.canvas.draw()
 
     def plot_data(self):
         if self.input_data_file_path is None:
